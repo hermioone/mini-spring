@@ -18,25 +18,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ClassPathXmlApplicationContext implements BeanFactory {
-    BeanFactory beanFactory;
+public class ClassPathXmlApplicationContext implements BeanFactory, ApplicationEventPublisher {
+    private final SimpleBeanFactory beanFactory;
 
     //context负责整合容器的启动过程，读外部配置，解析Bean定义，创建BeanFactory
     public ClassPathXmlApplicationContext(String fileName) {
         Resource resource = new ClassPathXmlResource(fileName);
-        BeanFactory beanFactory = new SimpleBeanFactory();
+        SimpleBeanFactory beanFactory = new SimpleBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
         reader.loadBeanDefinitions(resource);
         this.beanFactory = beanFactory;
     }
 
     //context再对外提供一个getBean，底下就是调用的BeanFactory对应的方法
+    @Override
     public Object getBean(String beanName) throws BeansException {
         return this.beanFactory.getBean(beanName);
     }
 
-    public void registerBeanDefinition(BeanDefinition beanDefinition) {
-        this.beanFactory.registerBeanDefinition(beanDefinition);
+    @Override
+    public Boolean containsBean(String name) {
+        return this.beanFactory.containsBean(name);
+    }
+
+    @Override
+    public boolean isSingleton(String name) {
+        return false;
+    }
+
+    @Override
+    public boolean isPrototype(String name) {
+        return false;
+    }
+
+    @Override
+    public Class<?> getType(String name) {
+        return null;
+    }
+
+    @Override
+    public void publishEvent(ApplicationEvent event) {
+
     }
 }
 
