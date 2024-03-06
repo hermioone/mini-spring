@@ -11,7 +11,7 @@ public class PropertyValues {
     private final List<PropertyValue> propertyValueList;
 
     public PropertyValues() {
-        this.propertyValueList = new ArrayList<>(0);
+        this.propertyValueList = new ArrayList<PropertyValue>(10);
     }
 
     public int size() {
@@ -22,9 +22,9 @@ public class PropertyValues {
         this.propertyValueList.add(pv);
     }
 
-    public void addPropertyValue(String propertyType, String propertyName, Object propertyValue) {
-        addPropertyValue(new PropertyValue(propertyType, propertyName, propertyValue));
-    }
+//	public void addPropertyValue(String propertyType, String propertyName, Object propertyValue) {
+//		addPropertyValue(new PropertyValue(propertyType, propertyName, propertyValue));
+//	}
 
     public void removePropertyValue(PropertyValue pv) {
         this.propertyValueList.remove(pv);
@@ -33,6 +33,7 @@ public class PropertyValues {
     public void removePropertyValue(String propertyName) {
         this.propertyValueList.remove(getPropertyValue(propertyName));
     }
+
 
     public PropertyValue[] getPropertyValues() {
         return this.propertyValueList.toArray(new PropertyValue[0]);
@@ -49,11 +50,11 @@ public class PropertyValues {
 
     public Object get(String propertyName) {
         PropertyValue pv = getPropertyValue(propertyName);
-        return pv != null ? pv.getValue() : null;
+        return (pv != null ? pv.getValue() : null);
     }
 
     public boolean contains(String propertyName) {
-        return getPropertyValue(propertyName) != null;
+        return (getPropertyValue(propertyName) != null);
     }
 
     public boolean isEmpty() {
