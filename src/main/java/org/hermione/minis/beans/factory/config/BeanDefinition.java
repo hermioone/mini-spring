@@ -1,7 +1,8 @@
-package org.hermione.minis.beans;
+package org.hermione.minis.beans.factory.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hermione.minis.beans.PropertyValues;
 
 @Setter
 @Getter
@@ -19,7 +20,7 @@ public class BeanDefinition {
     @Setter
     private String[] dependsOn;
     @Getter
-    private ArgumentValues constructorArgumentValues;
+    private ConstructorArgumentValues constructorArgumentValues;
     @Getter
     private PropertyValues propertyValues;
     @Getter
@@ -61,9 +62,9 @@ public class BeanDefinition {
         return SCOPE_PROTOTYPE.equals(scope);
     }
 
-    public void setConstructorArgumentValues(ArgumentValues constructorArgumentValues) {
+    public void setConstructorArgumentValues(ConstructorArgumentValues constructorArgumentValues) {
         this.constructorArgumentValues =
-                (constructorArgumentValues != null ? constructorArgumentValues : new ArgumentValues());
+                (constructorArgumentValues != null ? constructorArgumentValues : new ConstructorArgumentValues());
     }
 
     public boolean hasConstructorArgumentValues() {

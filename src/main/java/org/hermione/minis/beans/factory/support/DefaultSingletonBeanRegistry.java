@@ -1,4 +1,6 @@
-package org.hermione.minis.beans;
+package org.hermione.minis.beans.factory.support;
+
+import org.hermione.minis.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.ArrayList;
 import java.util.List;

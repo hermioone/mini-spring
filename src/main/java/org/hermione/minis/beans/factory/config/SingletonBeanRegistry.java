@@ -1,4 +1,4 @@
-package org.hermione.minis.beans;
+package org.hermione.minis.beans.factory.config;
 
 /**
  * 单例 Bean对象 的注册器

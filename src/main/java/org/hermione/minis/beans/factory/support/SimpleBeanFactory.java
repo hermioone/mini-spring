@@ -1,7 +1,14 @@
-package org.hermione.minis.beans;
+package org.hermione.minis.beans.factory.support;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hermione.minis.beans.factory.config.ConstructorArgumentValue;
+import org.hermione.minis.beans.factory.config.ConstructorArgumentValues;
+import org.hermione.minis.beans.factory.config.BeanDefinition;
+import org.hermione.minis.beans.BeansException;
+import org.hermione.minis.beans.PropertyValue;
+import org.hermione.minis.beans.PropertyValues;
+import org.hermione.minis.beans.factory.BeanFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -153,12 +160,12 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
             clz = Class.forName(bd.getClassName());
 
             //handle constructor
-            ArgumentValues argumentValues = bd.getConstructorArgumentValues();
+            ConstructorArgumentValues argumentValues = bd.getConstructorArgumentValues();
             if (!argumentValues.isEmpty()) {
                 Class<?>[] paramTypes = new Class<?>[argumentValues.getArgumentCount()];
                 Object[] paramValues =   new Object[argumentValues.getArgumentCount()];
                 for (int i=0; i<argumentValues.getArgumentCount(); i++) {
-                    ArgumentValue argumentValue = argumentValues.getIndexedArgumentValue(i);
+                    ConstructorArgumentValue argumentValue = argumentValues.getIndexedArgumentValue(i);
                     if ("String".equals(argumentValue.getType()) || "java.lang.String".equals(argumentValue.getType())) {
                         paramTypes[i] = String.class;
                         paramValues[i] = argumentValue.getValue();

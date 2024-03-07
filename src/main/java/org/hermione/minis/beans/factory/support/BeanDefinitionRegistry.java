@@ -1,4 +1,6 @@
-package org.hermione.minis.beans;
+package org.hermione.minis.beans.factory.support;
+
+import org.hermione.minis.beans.factory.config.BeanDefinition;
 
 /**
  * 管理 BeanDefinition 的注册器

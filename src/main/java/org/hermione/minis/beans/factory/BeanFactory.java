@@ -1,4 +1,6 @@
-package org.hermione.minis.beans;
+package org.hermione.minis.beans.factory;
+
+import org.hermione.minis.beans.BeansException;
 
 public interface BeanFactory {
     Object getBean(String beanName) throws BeansException;

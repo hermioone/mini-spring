@@ -11,5 +11,10 @@ public class TestMain {
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
         AService aService = (AService) ctx.getBean("aservice");
         aService.sayHello();
+
+        System.out.println("############");
+
+        BaseService baseService = (BaseService) ctx.getBean("baseservice");
+        baseService.sayHello();
     }
 }

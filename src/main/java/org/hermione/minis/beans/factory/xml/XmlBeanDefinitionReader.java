@@ -1,16 +1,21 @@
-package org.hermione.minis.beans;
+package org.hermione.minis.beans.factory.xml;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
+import org.hermione.minis.beans.factory.config.ConstructorArgumentValue;
+import org.hermione.minis.beans.factory.config.ConstructorArgumentValues;
+import org.hermione.minis.beans.factory.config.BeanDefinition;
+import org.hermione.minis.beans.PropertyValue;
+import org.hermione.minis.beans.PropertyValues;
+import org.hermione.minis.beans.factory.support.AbstractBeanFactory;
 import org.hermione.minis.core.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class XmlBeanDefinitionReader {
-    SimpleBeanFactory bf;
+    AbstractBeanFactory bf;
 
-    public XmlBeanDefinitionReader(SimpleBeanFactory bf) {
+    public XmlBeanDefinitionReader(AbstractBeanFactory bf) {
         this.bf = bf;
     }
 
@@ -24,12 +29,12 @@ public class XmlBeanDefinitionReader {
 
             //get constructor
             List<Element> constructorElements = element.elements("constructor-arg");
-            ArgumentValues AVS = new ArgumentValues();
+            ConstructorArgumentValues AVS = new ConstructorArgumentValues();
             for (Element e : constructorElements) {
                 String pType = e.attributeValue("type");
                 String pName = e.attributeValue("name");
                 String pValue = e.attributeValue("value");
-                AVS.addArgumentValue(new ArgumentValue(pType, pName, pValue));
+                AVS.addArgumentValue(new ConstructorArgumentValue(pType, pName, pValue));
             }
             beanDefinition.setConstructorArgumentValues(AVS);
             //end of handle constructor

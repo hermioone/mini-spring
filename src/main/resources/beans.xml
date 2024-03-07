@@ -20,6 +20,6 @@
     </bean>
 
     <bean id="baseservice" class="org.hermione.minis.BaseService">
-        <property type="org.hermione.minis.BaseBaseService" name="bbs" ref="basebaseservice"/>
+        <!--<property type="org.hermione.minis.BaseBaseService" name="bbs" ref="basebaseservice"/>-->
     </bean>
 </beans>

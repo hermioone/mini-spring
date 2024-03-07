@@ -28,7 +28,9 @@ public class AServiceImpl implements AService {
 
     @Override
     public void sayHello() {
+        System.out.println("-------- AServiceImpl start --------");
         System.out.println("sayHello(): " + this.property1 + ", " + this.property2);
         ref1.sayHello();
+        System.out.println("-------- AServiceImpl end --------");
     }
 }
