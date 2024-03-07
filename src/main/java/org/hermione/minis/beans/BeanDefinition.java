@@ -14,7 +14,7 @@ public class BeanDefinition {
      */
     @Getter
     @Setter
-    private boolean lazyInit = false;
+    private boolean lazyInit = true;
     @Getter
     @Setter
     private String[] dependsOn;

@@ -8,9 +8,14 @@ public class AServiceImpl implements AService {
     private String name;
     private int level;
     @Getter
+    @Setter
     private String property1;
     @Getter
+    @Setter
     private String property2;
+    @Getter
+    @Setter
+    private BaseService ref1;
 
     public AServiceImpl() {
     }
@@ -21,16 +26,9 @@ public class AServiceImpl implements AService {
         System.out.println(this.name + "," + this.level);
     }
 
-    public void setProperty1(String property1) {
-        this.property1 = property1;
-    }
-
-    public void setProperty2(String property2) {
-        this.property2 = property2;
-    }
-
     @Override
     public void sayHello() {
         System.out.println("sayHello(): " + this.property1 + ", " + this.property2);
+        ref1.sayHello();
     }
 }
