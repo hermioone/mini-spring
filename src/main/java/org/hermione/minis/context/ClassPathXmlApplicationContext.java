@@ -3,10 +3,11 @@ package org.hermione.minis.context;
 import lombok.Getter;
 import org.hermione.minis.beans.factory.BeanFactory;
 import org.hermione.minis.beans.BeansException;
+import org.hermione.minis.beans.factory.ConfigurableListableBeanFactory;
 import org.hermione.minis.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.hermione.minis.beans.factory.config.BeanFactoryPostProcessor;
-import org.hermione.minis.beans.factory.support.AbstractBeanFactory;
-import org.hermione.minis.beans.factory.support.AutowireCapableBeanFactory;
+import org.hermione.minis.beans.factory.support.AbstractAutowireCapableBeanFactory;
+import org.hermione.minis.beans.factory.support.DefaultListableBeanFactory;
 import org.hermione.minis.beans.factory.xml.XmlBeanDefinitionReader;
 import org.hermione.minis.core.ClassPathXmlResource;
 import org.hermione.minis.core.Resource;
@@ -14,20 +15,17 @@ import org.hermione.minis.core.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassPathXmlApplicationContext implements BeanFactory, ApplicationEventPublisher {
-    private final AutowireCapableBeanFactory beanFactory;
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+public class ClassPathXmlApplicationContext extends AbstractApplicationContext {
+    DefaultListableBeanFactory beanFactory;
 
-    @Getter
-    private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
-
-    //context负责整合容器的启动过程，读外部配置，解析Bean定义，创建BeanFactory
     public ClassPathXmlApplicationContext(String fileName) {
         this(fileName, true);
     }
 
     public ClassPathXmlApplicationContext(String fileName, boolean isRefresh) {
         Resource resource = new ClassPathXmlResource(fileName);
-        AutowireCapableBeanFactory beanFactory = new AutowireCapableBeanFactory();
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
         reader.loadBeanDefinitions(resource);
         this.beanFactory = beanFactory;
@@ -40,53 +38,54 @@ public class ClassPathXmlApplicationContext implements BeanFactory, ApplicationE
         }
     }
 
-    //context再对外提供一个getBean，底下就是调用的BeanFactory对应的方法
     @Override
-    public Object getBean(String beanName) throws BeansException {
-        return this.beanFactory.getBean(beanName);
+    public void registerListeners() {
+        ApplicationListener listener = new ApplicationListener();
+        this.getApplicationEventPublisher().addApplicationListener(listener);
     }
 
     @Override
-    public Boolean containsBean(String name) {
-        return this.beanFactory.containsBean(name);
+    public void initApplicationEventPublisher() {
+        ApplicationEventPublisher aep = new SimpleApplicationEventPublisher();
+        this.setApplicationEventPublisher(aep);
     }
 
     @Override
-    public boolean isSingleton(String name) {
-        return false;
-    }
-
-    @Override
-    public boolean isPrototype(String name) {
-        return false;
-    }
-
-    @Override
-    public Class<?> getType(String name) {
-        return null;
+    void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     }
 
     @Override
     public void publishEvent(ApplicationEvent event) {
-
+        this.getApplicationEventPublisher().publishEvent(event);
     }
 
-    public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor
-                                                    postProcessor) {
-        this.beanFactoryPostProcessors.add(postProcessor);
+    @Override
+    public void addApplicationListener(ApplicationListener listener) {
+        this.getApplicationEventPublisher().addApplicationListener(listener);
     }
-    public void refresh() throws BeansException, IllegalStateException {
-        // 注册 BeanPostProcessor
-        registerBeanPostProcessors(this.beanFactory);
-        // 实例化 Bean
-        onRefresh();
+
+    public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) {
+        this.getBeanFactoryPostProcessors().add(postProcessor);
     }
-    private void registerBeanPostProcessors(AutowireCapableBeanFactory beanFactory) {
-        beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
+
+    @Override
+    void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+        this.beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
     }
-    private void onRefresh() {
+
+    @Override
+    void onRefresh() {
         this.beanFactory.refresh();
     }
 
+    @Override
+    public ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException {
+        return this.beanFactory;
+    }
+
+    @Override
+    void finishRefresh() {
+        publishEvent(new ContextRefreshEvent("Context Refreshed..."));
+    }
 }
 

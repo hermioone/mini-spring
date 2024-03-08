@@ -5,7 +5,7 @@ import org.hermione.minis.beans.BeansException;
 public interface BeanFactory {
     Object getBean(String beanName) throws BeansException;
 
-    Boolean containsBean(String name);
+    boolean containsBean(String name);
 
     boolean isSingleton(String name);
 

@@ -6,6 +6,7 @@ import org.hermione.minis.beans.BeansException;
 import org.hermione.minis.beans.PropertyValue;
 import org.hermione.minis.beans.PropertyValues;
 import org.hermione.minis.beans.factory.BeanFactory;
+import org.hermione.minis.beans.factory.ConfigurableBeanFactory;
 import org.hermione.minis.beans.factory.config.BeanDefinition;
 import org.hermione.minis.beans.factory.config.ConstructorArgumentValue;
 import org.hermione.minis.beans.factory.config.ConstructorArgumentValues;
@@ -20,11 +21,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("UnusedReturnValue")
 @Slf4j
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory, BeanDefinitionRegistry {
-    private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
-    private final List<String> beanDefinitionNames = new ArrayList<>();
-    private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory, BeanDefinitionRegistry {
+    protected final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
+    protected final List<String> beanDefinitionNames = new ArrayList<>();
+    protected final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
     public AbstractBeanFactory() {
     }
@@ -85,7 +87,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
     }
 
     @Override
-    public Boolean containsBean(String name) {
+    public boolean containsBean(String name) {
         return containsSingleton(name);
     }
 
@@ -263,7 +265,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         }
     }
 
-    abstract public Object applyBeanPostProcessorBeforeInitialization(Object existingBean, String beanName) throws BeansException;
+    public abstract Object applyBeanPostProcessorBeforeInitialization(Object existingBean, String beanName) throws BeansException;
 
-    abstract public Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName) throws BeansException;
+    public abstract Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName) throws BeansException;
 }

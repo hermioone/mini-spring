@@ -4,8 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hermione.minis.beans.BeansException;
+import org.hermione.minis.beans.factory.BeanFactory;
 import org.hermione.minis.beans.factory.config.BeanPostProcessor;
-import org.hermione.minis.beans.factory.support.AutowireCapableBeanFactory;
+import org.hermione.minis.beans.factory.support.AbstractAutowireCapableBeanFactory;
 
 import java.lang.reflect.Field;
 
@@ -13,7 +14,12 @@ import java.lang.reflect.Field;
 @Getter
 @Setter
 public class AutowiredAnnotationBeanPostProcessor implements BeanPostProcessor {
-    private AutowireCapableBeanFactory beanFactory;
+    private BeanFactory beanFactory;
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
+    }
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
