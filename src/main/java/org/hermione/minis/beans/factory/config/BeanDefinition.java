@@ -20,9 +20,9 @@ public class BeanDefinition {
     @Setter
     private String[] dependsOn;
     @Getter
-    private ConstructorArgumentValues constructorArgumentValues;
+    private ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
     @Getter
-    private PropertyValues propertyValues;
+    private PropertyValues propertyValues = new PropertyValues();
     @Getter
     @Setter
     private String initMethodName;

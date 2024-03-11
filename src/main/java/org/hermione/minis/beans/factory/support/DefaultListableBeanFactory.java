@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements ConfigurableListableBeanFactory {
 
+    private ConfigurableListableBeanFactory parentBeanFactory;
+
     public int getBeanDefinitionCount() {
         return this.beanDefinitionMap.size();
     }
@@ -43,6 +45,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         for (String beanName : beanNames) {
             Object beanInstance = getBean(beanName);
             result.put(beanName, (T) beanInstance);
+        }
+        return result;
+    }
+
+    public void setParent(ConfigurableListableBeanFactory beanFactory) {
+        this.parentBeanFactory = beanFactory;
+    }
+
+    @Override
+    public Object getBean(String beanName) throws BeansException {
+        Object result = super.getBean(beanName);
+        if (result == null) {
+            result = this.parentBeanFactory.getBean(beanName);
         }
         return result;
     }

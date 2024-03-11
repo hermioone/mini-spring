@@ -56,8 +56,11 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
             singleton = this.earlySingletonObjects.get(beanName);
             if (singleton == null) {
                 // 如果连毛胚都没有，则创建bean实例并注册
-                log.info("get bean null -------------- {}", beanName);
+                log.info("Create bean: -------------- {}", beanName);
                 BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
+                if (beanDefinition == null) {
+                    return null;
+                }
                 singleton = createBean(beanDefinition);
                 this.registerBean(beanName, singleton);
                 // 进行 beanpostprocessor 处理
@@ -205,7 +208,6 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
                  IllegalAccessException e) {
             throw new BeansException(e);
         }
-        log.info("{} bean created. {} : {}", beanDefinition.getId(), beanDefinition.getClassName(), obj);
         return obj;
     }
 
@@ -215,7 +217,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     private void handleProperties(BeanDefinition beanDefinition, Class<?> clz, Object obj) throws BeansException {
         // handle properties
-        log.info("handle properties for bean : {}", beanDefinition.getId());
+        log.info("handle properties for bean: {}", beanDefinition.getId());
         PropertyValues propertyValues = beanDefinition.getPropertyValues();
         //如果有属性
         if (!propertyValues.isEmpty()) {
