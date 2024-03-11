@@ -2,6 +2,8 @@ package org.hermione.minis.web;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hermione.minis.beans.BeansException;
+import org.hermione.minis.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -10,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -20,11 +23,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings({"FieldCanBeLocal", "deprecation"})
+/**
+ * DispatcherServlet 就是 MVC 容器，在 DispatcherServlet 中可以访问子容器 WebApplicationContext
+ * 但是在 子容器中不能访问父容器 DispatcherServlet
+ */
+@SuppressWarnings({"FieldCanBeLocal", "deprecation", "UnusedReturnValue"})
 @Slf4j
 public class DispatcherServlet extends HttpServlet {
 
     private String sContextConfigLocation;
+
+    private WebApplicationContext wac;
 
 
     /**
@@ -62,10 +71,13 @@ public class DispatcherServlet extends HttpServlet {
      */
     private final Map<String, Method> mappingMethods = new HashMap<>();
 
+    @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        this.wac = (WebApplicationContext) this.getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
         // 1. 解析 minis-servlet.xml 中定义的 Bean
+        // 获取 web.xml 中 servlet 的 <init-param> 标签
         sContextConfigLocation = config.getInitParameter("contextConfigLocation");
         URL xmlPath = null;
         try {
@@ -88,22 +100,50 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     protected void initController() {
-        //扫描包，获取所有类名
         this.controllerNames.addAll(scanPackages(this.packageNames));
+
         for (String controllerName : this.controllerNames) {
             Object obj = null;
             Class<?> clz = null;
             try {
-                clz = Class.forName(controllerName); //加载类
-                this.controllerClasses.put(controllerName, clz);
-            } catch (Exception ignored) {
+                clz = Class.forName(controllerName);
+                this.controllerClasses.put(controllerName,clz);
+            } catch (ClassNotFoundException e) {
+                log.error(ExceptionUtils.getStackTrace(e));
             }
             try {
-                obj = Objects.requireNonNull(clz).newInstance(); //实例化bean
+                // 实例化 Controller
+                // 事实上这里也应该考虑通过将 Controller 的实例化和初始化放在 IoC 容器中，因为 Controller 可能只有有参构造函数
+                obj = Objects.requireNonNull(clz).newInstance();
+                // 渲染 Controller 中的 bean field
+                populateBean(obj,controllerName);
+
                 this.controllerObjs.put(controllerName, obj);
-            } catch (Exception ignored) {
+            } catch (InstantiationException | IllegalAccessException | BeansException e) {
+                log.error(ExceptionUtils.getStackTrace(e));
             }
         }
+    }
+
+    protected Object populateBean(Object bean, String beanName) throws BeansException {
+        Class<?> clazz = bean.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            boolean isAutowired = field.isAnnotationPresent(Autowired.class);
+            if (isAutowired) {
+                String fieldBeanName = field.getAnnotation(Autowired.class).value();
+                Object autowiredObj = this.wac.getBean(fieldBeanName);
+                try {
+                    field.setAccessible(true);
+                    field.set(bean, autowiredObj);
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    log.error(ExceptionUtils.getStackTrace(e));
+                }
+
+            }
+        }
+
+        return bean;
     }
 
     private List<String> scanPackages(List<String> packages) {

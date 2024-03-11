@@ -3,11 +3,22 @@
          xmlns:web="http://xmlns.jcp.org/xml/ns/javaee"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID">
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <!-- 注意：applicationContext.xml 要放在 resources 目录下，因为这个不像 minis-servelet.xml 一样是从 ${webapp} 目录下加载的 -->
+        <param-value>applicationContext.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.hermione.minis.web.ContextLoaderListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>minisMVC</servlet-name>
         <servlet-class>org.hermione.minis.web.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
+            <!-- 指定 DispatcherServlet 中需要加载的配置的路径 -->
             <param-value>/WEB-INF/minis-servlet.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
