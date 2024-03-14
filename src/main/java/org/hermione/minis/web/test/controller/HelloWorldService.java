@@ -1,4 +1,4 @@
-package org.hermione.minis.controller;
+package org.hermione.minis.web.test.controller;
 
 public class HelloWorldService {
 

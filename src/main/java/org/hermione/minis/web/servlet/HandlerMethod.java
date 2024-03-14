@@ -14,10 +14,24 @@ public class HandlerMethod {
     @Getter
     @Setter
     private  Method method;
+    @Getter
+    @Setter
     private  MethodParameter[] parameters;
+
+    @Getter
+    @Setter
     private  Class<?> returnType;
+
+    @Getter
+    @Setter
     private  String description;
+
+    @Getter
+    @Setter
     private  String className;
+
+    @Getter
+    @Setter
     private  String methodName;
 
     public HandlerMethod(Method method, Object obj) {

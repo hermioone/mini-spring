@@ -23,5 +23,7 @@
         <!--<property type="org.hermione.minis.BaseBaseService" name="bbs" ref="basebaseservice"/>-->
     </bean>
 
-    <bean id="helloWorldService" class="org.hermione.minis.controller.HelloWorldService"></bean>
+    <bean id="helloWorldService" class="org.hermione.minis.web.test.controller.HelloWorldService"></bean>
+
+    <bean id="webBindingInitializer" class="org.hermione.minis.web.test.DateInitializer">    </bean>
 </beans>

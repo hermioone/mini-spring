@@ -19,6 +19,10 @@ public class PropertyValue {
         this.isRef = isRef;
     }
 
+    public PropertyValue(String name, Object value) {
+        this("", name, value, false);
+    }
+
     public boolean getIsRef() {
         return isRef;
     }
