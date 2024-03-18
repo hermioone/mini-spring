@@ -25,5 +25,11 @@
 
     <bean id="helloWorldService" class="org.hermione.minis.web.test.controller.HelloWorldService"></bean>
 
-    <bean id="webBindingInitializer" class="org.hermione.minis.web.test.DateInitializer">    </bean>
+    <bean id="webBindingInitializer" class="org.hermione.minis.web.test.DateInitializer"></bean>
+
+    <bean id="viewResolver" class="org.hermione.minis.web.view.InternalResourceViewResolver" >
+        <property type="String" name="viewClassName" value="org.hermione.minis.web.view.JstlView" />
+        <property type="String" name="prefix" value="/jsp/" />
+        <property type="String" name="suffix" value=".jsp" />
+    </bean>
 </beans>

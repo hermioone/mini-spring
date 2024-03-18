@@ -5,7 +5,11 @@ import org.hermione.minis.beans.factory.annotation.Autowired;
 import org.hermione.minis.web.RequestMapping;
 import org.hermione.minis.web.common.ModelAttribute;
 import org.hermione.minis.web.common.RequestParam;
+import org.hermione.minis.web.common.ResponseBody;
 import org.hermione.minis.web.test.User;
+import org.hermione.minis.web.view.ModelAndView;
+
+import java.util.Date;
 
 
 public class HelloWorldBean {
@@ -17,12 +21,18 @@ public class HelloWorldBean {
      * value 是 bean 的 id
      */
     @RequestMapping(value = "/test1")
-    public String doGet2(String name, @RequestParam int age) {
-        return "name: " + name + ", age: " + age + " -> " + helloWorldService.hello();
+    public ModelAndView doGet2(String name, @RequestParam int age) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("helloJsp");
+        mav.addAttribute("name", name);
+        mav.addAttribute("age", age);
+        return mav;
     }
 
-    @RequestMapping("/test2")
-    public String doGet2(@ModelAttribute User user) {
-        return "hello world!: " + user.getName();
+    @ResponseBody
+    @RequestMapping("/test3")
+    public User doGet3(@ModelAttribute User user) {
+        user.setBirthday(new Date());
+        return user;
     }
 }

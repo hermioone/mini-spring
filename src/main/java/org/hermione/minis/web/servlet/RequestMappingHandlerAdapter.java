@@ -7,11 +7,15 @@ import org.hermione.minis.beans.BeansException;
 import org.hermione.minis.beans.property.PropertyEditor;
 import org.hermione.minis.beans.property.PropertyEditorRegistrySupport;
 import org.hermione.minis.util.WebUtils;
+import org.hermione.minis.web.DefaultHttpMessageConverter;
+import org.hermione.minis.web.HttpMessageConverter;
 import org.hermione.minis.web.WebApplicationContext;
 import org.hermione.minis.web.WebBindingInitializer;
 import org.hermione.minis.web.WebDataBinder;
 import org.hermione.minis.web.WebDataBinderFactory;
 import org.hermione.minis.web.common.ModelAttribute;
+import org.hermione.minis.web.common.ResponseBody;
+import org.hermione.minis.web.view.ModelAndView;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -23,9 +27,11 @@ import javax.servlet.http.HttpServletResponse;
 public class RequestMappingHandlerAdapter implements HandlerAdapter {
     private final WebApplicationContext wac;
     private final WebBindingInitializer webBindingInitializer;
+    private final HttpMessageConverter messageConverter;
 
     public RequestMappingHandlerAdapter(WebApplicationContext wac) {
         this.wac = wac;
+        this.messageConverter = new DefaultHttpMessageConverter();
         try {
             this.webBindingInitializer = (WebBindingInitializer) this.wac.getBean("webBindingInitializer");
         } catch (BeansException e) {
@@ -33,25 +39,26 @@ public class RequestMappingHandlerAdapter implements HandlerAdapter {
         }
     }
 
-    public void handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        handleInternal(request, response, (HandlerMethod) handler);
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        return handleInternal(request, response, (HandlerMethod) handler);
     }
 
-    private void handleInternal(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler) {
+    private ModelAndView handleInternal(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler) {
         try {
-            invokeHandlerMethod(request, response, handler);
+            return invokeHandlerMethod(request, response, handler);
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }
+        return null;
     }
 
     /**
      * 对于 http://localhost:8080/test1?name=hermione&age=16 这个请求来说，Spring MVC 有2种接收参数方式：
-     *  1. String test1(@RequestParam() String name, @RequestParam() int age)
-     *  2. String test1(@ModelAttribute() User user), @ModelAttribute() 通常可以省略
-     *  这个类主要就是用于处理第2种情况
+     * 1. String test1(@RequestParam() String name, @RequestParam() int age)
+     * 2. String test1(@ModelAttribute() User user), @ModelAttribute() 通常可以省略
+     * 这个类主要就是用于处理第2种情况
      */
-    protected void invokeHandlerMethod(HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
+    protected ModelAndView invokeHandlerMethod(HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
         WebDataBinderFactory binderFactory = new WebDataBinderFactory();
         Parameter[] methodParameters = handlerMethod.getMethod().getParameters();
         Object[] methodParamObjs = new Object[methodParameters.length];
@@ -79,6 +86,22 @@ public class RequestMappingHandlerAdapter implements HandlerAdapter {
         }
         Method invocableMethod = handlerMethod.getMethod();
         Object returnObj = invocableMethod.invoke(handlerMethod.getBean(), methodParamObjs);
-        response.getWriter().append(returnObj.toString());
+        if (invocableMethod.isAnnotationPresent(ResponseBody.class)) {
+            // 返回纯 json 数据
+            this.messageConverter.write(returnObj, response);
+            return null;
+        }
+
+        // 返回页面
+        ModelAndView mav = null;
+        if (returnObj instanceof ModelAndView) {
+            mav = (ModelAndView) returnObj;
+        } else if (returnObj instanceof String) {
+            // 字符串也认为是前端页面
+            String sTarget = (String) returnObj;
+            mav = new ModelAndView();
+            mav.setViewName(sTarget);
+        }
+        return mav;
     }
 }
