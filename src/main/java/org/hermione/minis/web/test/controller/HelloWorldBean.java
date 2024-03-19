@@ -11,6 +11,7 @@ import org.hermione.minis.web.test.service.UserService;
 import org.hermione.minis.web.view.ModelAndView;
 
 import java.util.Date;
+import java.util.List;
 
 
 public class HelloWorldBean {
@@ -42,7 +43,7 @@ public class HelloWorldBean {
 
     @ResponseBody
     @RequestMapping(("/test4"))
-    public User doGet4(@RequestParam int id) {
+    public List<User> doGet4(@RequestParam int id) {
         return userService.getUserInfo(id);
     }
 }

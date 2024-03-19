@@ -37,11 +37,12 @@
         <property type="javax.sql.DataSource" name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="dataSource" class="org.hermione.minis.jdbc.datasource.SingleConnectionDataSource">
+    <bean id="dataSource" class="org.hermione.minis.jdbc.pool.PooledDataSource">
         <property type="String" name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
         <property type="String" name="url" value="jdbc:mysql://10.88.8.155:3306/test"/>
         <property type="String" name="username" value="hive"/>
         <property type="String" name="password" value="PffQwP4acN13PyYY"/>
+        <property type="int" name="initialSize" value="3"/>
     </bean>
 
     <bean id="userService" class="org.hermione.minis.web.test.service.UserService"/>
