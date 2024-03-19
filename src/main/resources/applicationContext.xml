@@ -32,4 +32,17 @@
         <property type="String" name="prefix" value="/jsp/" />
         <property type="String" name="suffix" value=".jsp" />
     </bean>
+
+    <bean id="jdbcTemplate" class="org.hermione.minis.jdbc.core.JdbcTemplate">
+        <property type="javax.sql.DataSource" name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="dataSource" class="org.hermione.minis.jdbc.datasource.SingleConnectionDataSource">
+        <property type="String" name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property type="String" name="url" value="jdbc:mysql://10.88.8.155:3306/test"/>
+        <property type="String" name="username" value="hive"/>
+        <property type="String" name="password" value="PffQwP4acN13PyYY"/>
+    </bean>
+
+    <bean id="userService" class="org.hermione.minis.web.test.service.UserService"/>
 </beans>
