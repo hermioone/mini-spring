@@ -46,4 +46,10 @@ public class HelloWorldBean {
     public List<User> doGet4(@RequestParam int id) {
         return userService.getUserInfo(id);
     }
+
+    @ResponseBody
+    @RequestMapping(("/test5"))
+    public User doGet5(@RequestParam int id) {
+        return userService.getUserInfo2(id);
+    }
 }

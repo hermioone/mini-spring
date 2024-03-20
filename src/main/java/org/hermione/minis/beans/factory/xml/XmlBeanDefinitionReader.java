@@ -1,5 +1,6 @@
 package org.hermione.minis.beans.factory.xml;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.hermione.minis.beans.factory.config.ConstructorArgumentValue;
 import org.hermione.minis.beans.factory.config.ConstructorArgumentValues;
@@ -24,8 +25,12 @@ public class XmlBeanDefinitionReader {
             Element element = (Element) res.next();
             String beanID = element.attributeValue("id");
             String beanClassName = element.attributeValue("class");
+            String initMethod = element.attributeValue("init-method");
 
             BeanDefinition beanDefinition = new BeanDefinition(beanID, beanClassName);
+            if (StringUtils.isNotBlank(initMethod)) {
+                beanDefinition.setInitMethodName(initMethod);
+            }
 
             //get constructor
             List<Element> constructorElements = element.elements("constructor-arg");

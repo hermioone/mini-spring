@@ -46,4 +46,8 @@
     </bean>
 
     <bean id="userService" class="org.hermione.minis.web.test.service.UserService"/>
+
+    <bean id="sqlSessionFactory" class="org.hermione.minis.batis.DefaultSqlSessionFactory" init-method="init">
+        <property type="String" name="mapperLocations" value="mapper"></property>
+    </bean>
 </beans>

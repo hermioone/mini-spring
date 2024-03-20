@@ -79,12 +79,16 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
     }
 
     private void invokeInitMethod(BeanDefinition beanDefinition, Object obj) throws BeansException {
-        Class<?> clz = beanDefinition.getClass();
-        Method method = null;
         try {
-            method = clz.getMethod(beanDefinition.getInitMethodName());
-            method.invoke(obj);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            Class<?> clz = Class.forName(beanDefinition.getClassName());
+            Method method = null;
+            try {
+                method = clz.getMethod(beanDefinition.getInitMethodName());
+                method.invoke(obj);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                throw new BeansException(e);
+            }
+        } catch (Exception e) {
             throw new BeansException(e);
         }
     }
@@ -169,31 +173,21 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         try {
             clz = Class.forName(beanDefinition.getClassName());
             // handle constructor
-            ConstructorArgumentValues constructorArgumentValues =
-                    beanDefinition.getConstructorArgumentValues();
+            ConstructorArgumentValues constructorArgumentValues = beanDefinition.getConstructorArgumentValues();
             if (!constructorArgumentValues.isEmpty()) {
-                Class<?>[] paramTypes = new Class<?>
-                        [constructorArgumentValues.getArgumentCount()];
-                Object[] paramValues = new
-                        Object[constructorArgumentValues.getArgumentCount()];
-                for (int i = 0; i <
-                        constructorArgumentValues.getArgumentCount(); i++) {
-                    ConstructorArgumentValue constructorArgumentValue =
-                            constructorArgumentValues.getIndexedArgumentValue(i);
-                    if ("String".equals(constructorArgumentValue.getType()) ||
-                            "java.lang.String".equals(constructorArgumentValue.getType())) {
+                Class<?>[] paramTypes = new Class<?>[constructorArgumentValues.getArgumentCount()];
+                Object[] paramValues = new Object[constructorArgumentValues.getArgumentCount()];
+                for (int i = 0; i < constructorArgumentValues.getArgumentCount(); i++) {
+                    ConstructorArgumentValue constructorArgumentValue = constructorArgumentValues.getIndexedArgumentValue(i);
+                    if ("String".equals(constructorArgumentValue.getType()) || "java.lang.String".equals(constructorArgumentValue.getType())) {
                         paramTypes[i] = String.class;
                         paramValues[i] = constructorArgumentValue.getValue();
-                    } else if
-                    ("Integer".equals(constructorArgumentValue.getType()) ||
-                                    "java.lang.Integer".equals(constructorArgumentValue.getType())) {
+                    } else if ("Integer".equals(constructorArgumentValue.getType()) || "java.lang.Integer".equals(constructorArgumentValue.getType())) {
                         paramTypes[i] = Integer.class;
-                        paramValues[i] = Integer.valueOf((String)
-                                constructorArgumentValue.getValue());
+                        paramValues[i] = Integer.valueOf((String) constructorArgumentValue.getValue());
                     } else if ("int".equals(constructorArgumentValue.getType())) {
                         paramTypes[i] = int.class;
-                        paramValues[i] = Integer.valueOf((String)
-                                constructorArgumentValue.getValue());
+                        paramValues[i] = Integer.valueOf((String) constructorArgumentValue.getValue());
                     } else {
                         paramTypes[i] = String.class;
                         paramValues[i] = constructorArgumentValue.getValue();

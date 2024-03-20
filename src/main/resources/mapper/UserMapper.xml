@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="org.hermione.minis.web.test.mapper.UserMapper">
+    <select id="getUserInfo" parameterType="java.lang.Integer" resultType="org.hermione.minis.web.test.User">
+        select id, name, age, birthday from users where id=?
+    </select>
+</mapper>
