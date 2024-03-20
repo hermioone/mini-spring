@@ -6,6 +6,7 @@ import org.hermione.minis.beans.BeansException;
 import org.hermione.minis.beans.PropertyValue;
 import org.hermione.minis.beans.PropertyValues;
 import org.hermione.minis.beans.factory.BeanFactory;
+import org.hermione.minis.beans.factory.BeanFactoryAware;
 import org.hermione.minis.beans.factory.ConfigurableBeanFactory;
 import org.hermione.minis.beans.factory.FactoryBean;
 import org.hermione.minis.beans.factory.config.BeanDefinition;
@@ -64,6 +65,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
                 }
                 singleton = createBean(beanDefinition);
                 this.registerBean(beanName, singleton);
+
+                if (singleton instanceof BeanFactoryAware) {
+                    ((BeanFactoryAware) singleton).setBeanFactory(this);
+                }
+
                 // 进行 beanpostprocessor 处理
                 // step 1: postProcessBeforeInitialization
                 applyBeanPostProcessorBeforeInitialization(singleton, beanName);

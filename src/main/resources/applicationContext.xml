@@ -52,7 +52,10 @@
     </bean>
 
     <bean id="realaction" class="org.hermione.minis.web.test.service.ActionImpl" />
-    <bean id="action" class="org.hermione.minis.aop.ProxyFactoryBean" >
+    <bean id="action" class="org.hermione.minis.aop.ProxyFactoryBean">
         <property type="java.lang.Object" name="target" ref="realaction"/>
+        <property type="String" name="interceptorName" value="myInterceptor"/>
     </bean>
+
+    <bean id="myInterceptor" class="org.hermione.minis.aop.TracingInterceptor" />
 </beans>
