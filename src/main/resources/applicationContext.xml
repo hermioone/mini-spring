@@ -50,4 +50,9 @@
     <bean id="sqlSessionFactory" class="org.hermione.minis.batis.DefaultSqlSessionFactory" init-method="init">
         <property type="String" name="mapperLocations" value="mapper"></property>
     </bean>
+
+    <bean id="realaction" class="org.hermione.minis.web.test.service.ActionImpl" />
+    <bean id="action" class="org.hermione.minis.aop.ProxyFactoryBean" >
+        <property type="java.lang.Object" name="target" ref="realaction"/>
+    </bean>
 </beans>

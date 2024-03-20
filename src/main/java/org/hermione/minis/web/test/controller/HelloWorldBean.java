@@ -7,6 +7,7 @@ import org.hermione.minis.web.common.ModelAttribute;
 import org.hermione.minis.web.common.RequestParam;
 import org.hermione.minis.web.common.ResponseBody;
 import org.hermione.minis.web.test.User;
+import org.hermione.minis.web.test.service.IAction;
 import org.hermione.minis.web.test.service.UserService;
 import org.hermione.minis.web.view.ModelAndView;
 
@@ -21,6 +22,9 @@ public class HelloWorldBean {
 
     @Autowired(value = "userService")
     private UserService userService;
+
+    @Autowired(value = "action")
+    private IAction iAction;
 
     /**
      * value 是 bean 的 id
@@ -51,5 +55,11 @@ public class HelloWorldBean {
     @RequestMapping(("/test5"))
     public User doGet5(@RequestParam int id) {
         return userService.getUserInfo2(id);
+    }
+
+    @ResponseBody
+    @RequestMapping("/testAop")
+    public String testAop() {
+        return iAction.doAction();
     }
 }

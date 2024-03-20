@@ -7,6 +7,7 @@ import org.hermione.minis.beans.PropertyValue;
 import org.hermione.minis.beans.PropertyValues;
 import org.hermione.minis.beans.factory.BeanFactory;
 import org.hermione.minis.beans.factory.ConfigurableBeanFactory;
+import org.hermione.minis.beans.factory.FactoryBean;
 import org.hermione.minis.beans.factory.config.BeanDefinition;
 import org.hermione.minis.beans.factory.config.ConstructorArgumentValue;
 import org.hermione.minis.beans.factory.config.ConstructorArgumentValues;
@@ -23,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("UnusedReturnValue")
 @Slf4j
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory, BeanDefinitionRegistry {
+public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory, BeanDefinitionRegistry {
     protected final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
     protected final List<String> beanDefinitionNames = new ArrayList<>();
     protected final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
@@ -75,7 +76,23 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
             }
         }
 
+        // 处理 FactoryBean 的情况：处理动态代理
+        if (singleton instanceof FactoryBean) {
+            return this.getObjectForBeanInstance(singleton, beanName);
+        }
+
         return singleton;
+    }
+
+    protected Object getObjectForBeanInstance(Object beanInstance, String beanName) {
+        // Now we have the bean instance, which may be a normal bean or a FactoryBean.
+        if (!(beanInstance instanceof FactoryBean)) {
+            return beanInstance;
+        }
+        Object object = null;
+        FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
+        object = getObjectFromFactoryBean(factory, beanName);
+        return object;
     }
 
     private void invokeInitMethod(BeanDefinition beanDefinition, Object obj) throws BeansException {
